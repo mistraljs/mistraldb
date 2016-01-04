@@ -1,0 +1,28 @@
+{
+  "name": "mistraldb",
+  "version": "0.0.1",
+  "description": "a simple database engine for prototyping",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mistraljs/mistraldb.git"
+  },
+  "keywords": [
+    "database",
+    "local",
+    "JSON",
+    "lodash"
+  ],
+  "author": "Yoza Wiratama <y_wiratama@yahoo.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mistraljs/mistraldb/issues"
+  },
+  "homepage": "https://github.com/mistraljs/mistraldb#readme",
+  "dependencies": {
+    "lodash": "^3.10.1"
+  }
+}
