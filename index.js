@@ -1,73 +1,79 @@
 var fs = require('fs');
-var lodash = require('lodash');
+var _ = require('lodash');
 
-exports.Collection = function (name) {
 
-    if (!fs.existsSync('./' + name + '.json')) {
+var Database = function (name) {
+    var self = this;
+    self.name = name;
+    if (!fs.existsSync('./databases'))
+        fs.mkdir('./databases');
+
+    if (!fs.existsSync('./databases/' + name))
+        fs.mkdir('./databases/' + name);
+
+    if (!fs.existsSync('./databases/' + name + '/init.db')) {
+        var initdb = {
+            createdAt: new Date().getTime(),
+            collections: []
+        };
+        fs.writeFileSync('./databases/' + name + '/init.db', JSON.stringify(initdb), 'utf8', function (err) {
+            if (err) {
+                console.log('error on create database');
+                return console.log(err);
+            }
+            console.log("Collection was created!");
+        });
+    }
+
+};
+
+var Collection = function (db, name) {
+    var dbpath = './databases/' + db.name + '/';
+    var colpath = dbpath + name + '.mc';
+    if (!fs.existsSync(colpath)) {
         var def = {
             datas: []
         };
-        writeCollectionFileSync(name, JSON.stringify(def));
+        writeCollectionFileSync(colpath, JSON.stringify(def));
     }
     var self = this;
-    var col = JSON.parse(fs.readFileSync('./' + name + '.json').toString());
+    var col = JSON.parse(fs.readFileSync(colpath).toString());
     self.name = name;
     self.insert = function (param) {
-        if (param['id'])
+        if (!param['id'])
             param['id'] = randomId(27);
         col.datas.push(param);
-        writeCollectionFileSync(self.name, JSON.stringify(col));
+        writeCollectionFileSync(colpath, JSON.stringify(col));
         return param.id;
-    },
-        self.update = function (query, set) {
-            var domain = localStorage[self.name];
-            if (domain) {
-                domain = JSON.parse(domain);
-                _.each(domain, function (item) {
-                    if (_.isMatch(item, query)) {
-                        for (var s in set) {
-                            item[s] = set[s];
-                        }
-                    }
+    };
+    self.update = function (query, set) {
+        _.forEach(col.datas, function (n, key) {
+            if (_.isMatch(n, query)) {
+                for (var s in set) {
+                    n[s] = set[s];
+                }
+            }
 
-                });
-                localStorage[self.name] = JSON.stringify(domain);
-                Mistral.refresh();
-                //console.log(match);
-            }
-            else console.log("Collection undefined");
-        },
-        self.remove = function (param) {
-            var domain = localStorage[self.name];
-            if (domain) {
-                domain = JSON.parse(domain);
-                domain = _.without(domain, _.findWhere(domain, param));
-                localStorage[self.name] = JSON.stringify(domain);
-                Mistral.refresh();
-            }
-            else console.log("Collection undefined");
-        },
-        self.find = function (param) {
-            var domain = localStorage[self.name];
-            if (domain) {
-                domain = JSON.parse(domain);
-                return _.where(domain, param);
-            }
-            else return [];
-        },
-        self.findOne = function (param) {
-            var domain = localStorage[self.name];
-            if (domain) {
-                domain = JSON.parse(domain);
-                return _.findWhere(domain, param);
-            }
-            else return [];
-        }
+        });
 
-    console.log('init collection : ' + name);
+        writeCollectionFileSync(colpath, JSON.stringify(col));
+    };
+    self.remove = function (param) {
+        col.datas = _.without(col.datas, _.findWhere(col.datas, param));
+        writeCollectionFileSync(colpath, JSON.stringify(col));
+    };
+    self.find = function (param) {
+        return _.where(col.datas, param);
+    };
+    self.findOne = function (param) {
+        return _.findWhere(col.datas, param);
+    };
+
 };
 
-exports.Random = {
+
+
+var Random = {
     id: function (length) {
         return randomId(length);
     }
@@ -85,8 +91,8 @@ function randomId(length) {
     return text;
 }
 
-function  writeCollectionFileSync(name, content){
-    fs.writeFileSync('./' + name + '.json', content, 'utf8', function (err) {
+function writeCollectionFileSync(name, content) {
+    fs.writeFileSync(name, content, 'utf8', function (err) {
         if (err) {
             console.log('error on create database');
             return console.log(err);
@@ -94,3 +100,9 @@ function  writeCollectionFileSync(name, content){
         console.log("Collection was created!");
     });
 }
+
+module.exports = {
+    Database: Database,
+    Collection: Collection,
+    Random: Random
+};
