@@ -1,5 +1,4 @@
-# MistralDB v.0.1.0
-A simple database engine for prototyping.
+# Documentation
 
 # Installation
 `npm install --save mistraldb`
@@ -8,8 +7,6 @@ A simple database engine for prototyping.
 ```
 const Mistral = require('mistraldb');
 ```
-
-[More Documentation](https://github.com/mistraljs/mistraldb/blob/master/docs.md "Documentation")
 
 # Database and Collection
 ```
@@ -23,7 +20,6 @@ var servantdb = new Mistral.Database('servantdb');
 var countries = new Mistral.Collection(masterdb, 'country');
 var posts = new Mistral.Collection(servantdb, 'post');
 ```
-
 
 ## insert(data)
 ```
@@ -66,6 +62,63 @@ posts.remove({
 });
 ```
 
+## first()
+return first record in collection.
+```
+posts.first();
+```
+
+## last()
+return last record in collection.
+```
+posts.last();
+```
+
+## take(amount)
+return 5 records.
+```
+posts.take(5);
+```
+## without()
+return records without record with id: 'bEYikyBwFO4BjvLqv5r626lhYHV'.
+```
+posts.without({id: 'bEYikyBwFO4BjvLqv5r626lhYHV'});
+```
+## at(position)
+return record at position.
+```
+var p = posts.at(5);
+```
+## map(param)
+return all createdBy in array.
+```
+var creatorIds = posts.map(function(p) { return p.createdBy });
+```
+## count()
+return size of collection.
+```
+var p = posts.count();
+```
+## shuffle()
+```
+var p = posts.shuffle();
+```
+## sortBy(param)
+return records sorted by createdAt.
+```
+var p = posts.sortBy('createdAt');
+```
+## pluck(param)
+return record's field `content` in array.
+```
+var p = posts.pluck('content');
+```
+## where(source)
+return records where `isPublished : false`.
+```
+var p = posts.where({isPublished : false});
+```
+
 # Random
 Random function to generate unique
 ```
@@ -75,15 +128,3 @@ const Random = require('mistraldb').Random;
 ```
 console.log(Random.id(27)); //bEYikyBwFO4BjvLqv5r626lhYHV
 ```
-
-
-
-# LICENSE
-The MIT License (MIT)
-Copyright (c) 2015 by Yoza Wiratama
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

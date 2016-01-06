@@ -68,6 +68,40 @@ var Collection = function (db, name) {
     self.findOne = function (param) {
         return _.findWhere(col.datas, param);
     };
+    self.first = function () {
+        return _.first(col.datas);
+    };
+    self.last = function () {
+        return _.last(col.datas);
+    };
+    self.take = function (amount) {
+        return _.take(col.datas, amount);
+    };
+    self.without = function (param) {
+        return _.without(col.datas, param);
+    };
+    //collection
+    self.at = function(positions){
+        return _.at(col.datas, positions);
+    };
+    self.map = function(param){
+        return _.map(col.datas, param);
+    };
+    self.count = function(){
+        return _.size(col.datas);
+    };
+    self.shuffle = function(){
+        return _.shuffle(col.datas);
+    };
+    self.sortBy = function(param){
+        return _.sortBy(col.datas,param);
+    };
+    self.pluck = function(path){
+        return _.pluck(col.datas,path);
+    };
+    self.where = function(source){
+        return _.pluck(col.datas,source);
+    };
 
 };
 
