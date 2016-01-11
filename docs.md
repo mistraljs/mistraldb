@@ -118,6 +118,13 @@ return records where `isPublished : false`.
 ```
 var p = posts.where({isPublished : false});
 ```
+## watch(callback(added)) **beta**
+Detect change on collection but for now only while server is running.
+```
+posts.watch(function(added){
+    console.log(added);
+});
+```
 
 # Random
 Random function to generate unique

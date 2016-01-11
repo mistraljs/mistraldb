@@ -1,22 +1,38 @@
 var fs = require('fs');
 var _ = require('lodash');
 
+function unExistAndMkdir(path, cb) {
+    //if (path !== './')
+        fs.existsSync(path, function (exist) {
+            if (!exist)
+                fs.mkdir(path, function () {
+                    cb();
+                });
+            else cb();
+        })
+}
 
-var Database = function (name) {
+var Database = function (name, path) {
+    if (!path) path = './';
     var self = this;
     self.name = name;
-    if (!fs.existsSync('./databases'))
-        fs.mkdir('./databases');
+    self.path = path + 'databases/' + name;
+    self.rootPath = path;
 
-    if (!fs.existsSync('./databases/' + name))
-        fs.mkdir('./databases/' + name);
+    if(!fs.existsSync(path))
+        fs.mkdirSync(path);
+    if (!fs.existsSync(path +'databases'))
+        fs.mkdirSync(path+'databases');
 
-    if (!fs.existsSync('./databases/' + name + '/init.db')) {
+    if (!fs.existsSync(path+'databases/' + name))
+        fs.mkdirSync(path+'databases/' + name);
+
+    if (!fs.existsSync(path+'databases/' + name + '/init.db')) {
         var initdb = {
             createdAt: new Date().getTime(),
             collections: []
         };
-        fs.writeFileSync('./databases/' + name + '/init.db', JSON.stringify(initdb), 'utf8', function (err) {
+        fs.writeFileSync(path+'databases/' + name + '/init.db', JSON.stringify(initdb), 'utf8', function (err) {
             if (err) {
                 console.log('error on create database');
                 return console.log(err);
@@ -28,8 +44,9 @@ var Database = function (name) {
 };
 
 var Collection = function (db, name) {
-    var dbpath = './databases/' + db.name + '/';
+    var dbpath = db.path + '/';
     var colpath = dbpath + name + '.mc';
+
     if (!fs.existsSync(colpath)) {
         var def = {
             datas: []
@@ -81,30 +98,40 @@ var Collection = function (db, name) {
         return _.without(col.datas, param);
     };
     //collection
-    self.at = function(positions){
+    self.at = function (positions) {
         return _.at(col.datas, positions);
     };
-    self.map = function(param){
+    self.map = function (param) {
         return _.map(col.datas, param);
     };
-    self.count = function(){
+    self.count = function () {
         return _.size(col.datas);
     };
-    self.shuffle = function(){
+    self.shuffle = function () {
         return _.shuffle(col.datas);
     };
-    self.sortBy = function(param){
-        return _.sortBy(col.datas,param);
+    self.sortBy = function (param) {
+        return _.sortBy(col.datas, param);
     };
-    self.pluck = function(path){
-        return _.pluck(col.datas,path);
+    self.pluck = function (path) {
+        return _.pluck(col.datas, path);
     };
-    self.where = function(source){
-        return _.pluck(col.datas,source);
+    self.where = function (source) {
+        return _.pluck(col.datas, source);
     };
+    self.watch = function (cb) {
+        fs.watchFile(colpath, function (curr, prev) {
+            newcol = JSON.parse(fs.readFileSync(colpath).toString());
+            var added = [];
+            for (var ii = col.datas.length; ii < newcol.datas.length; ii++) {
+                added.push(newcol.datas[ii]);
+            }
+            col.datas = newcol.datas;
+            cb(added);
+        });
 
+    }
 };
-
 
 
 var Random = {
